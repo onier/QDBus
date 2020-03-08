@@ -15,7 +15,7 @@ public:
 
 signals:
     Q_SCRIPTABLE void needHelp(Letter reason);
-    void parcelRecived(QString parcelDescription);
+    Q_SCRIPTABLE void parcelRecived(QString parcelDescription);
 
 public slots:
     Q_SCRIPTABLE Q_NOREPLY void reciveParcel(Parcel parcelFromParents);

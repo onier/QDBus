@@ -2,85 +2,83 @@
 
 #include <QDBusConnection>
 #include <QDebug>
+#include <iostream>
 
 Parents::Parents(QObject *parent) :
-    QObject(parent)
-{
+        QObject(parent) {
     connectToDBusSignal();
 }
 
-Parents::~Parents()
-{
+Parents::~Parents() {
 }
 
-void Parents::reciveLetter(const Letter letterFromStudent)
-{
-    qDebug()<<"Letter recived: ";
-    qDebug()<<"Letter text: "<<letterFromStudent.text;
-    qDebug()<<"Letter date: "<<letterFromStudent.letterDate;
-    qDebug()<<"Letter date: "<<letterFromStudent.summ.summ;
-    qDebug()<<"Letter date: "<<letterFromStudent.summ.type;
+void Parents::reciveLetter(const Letter letterFromStudent) {
+    qDebug() << "Letter recived from student: " << letterFromStudent;
     sendHelpToChild(letterFromStudent);
 }
 
-void Parents::connectToDBusSignal()
-{
+void Parents::connectToDBusSignal() {
     bool isConnected = QDBusConnection::sessionBus().connect(
             "",
             dbus::studentServicePath(),
             dbus::studentServiceName(),
             "needHelp", this,
             SLOT(reciveLetter(Letter)));
-    if(!isConnected)
-        qDebug()<<"Can't connect to needHelp signal";
+    if (!isConnected)
+        qDebug() << "Can't connect to needHelp signal";
     else
-        qDebug()<<"connect to needHelp signal";
-
+        qDebug() << "connect to needHelp signal";
+    isConnected = QDBusConnection::sessionBus().connect(
+            "",
+            dbus::studentServicePath(),
+            dbus::studentServiceName(),
+            "parcelRecived", this,
+            SLOT(reciveParcel(QString)));
+    if (!isConnected)
+        qDebug() << "Can't connect to parcelRecived signal";
+    else
+        qDebug() << "connect to parcelRecived signal";
 }
 
-void Parents::sendHelpToChild(const Letter letterFromStudent)  const
-{
+void Parents::sendHelpToChild(const Letter letterFromStudent) const {
     Parcel preparingParcel;
     preparingParcel.letter = writeLetter(letterFromStudent);
     preparingParcel.someFood = poskrestiPoSusekam();
     sendParcel(preparingParcel);
 }
 
-void Parents::sendParcel(const Parcel parentsParcel) const
-{
+void Parents::sendParcel(const Parcel parentsParcel) const {
     const QString studentMetod = "reciveParcel";
-    QDBusMessage sendParcel = QDBusMessage::createMethodCall(dbus::studentServiceName(), dbus::studentServicePath(), "", studentMetod);
+    QDBusMessage sendParcel = QDBusMessage::createMethodCall(dbus::studentServiceName(), dbus::studentServicePath(), "",
+                                                             studentMetod);
 
     QList<QVariant> arg;
     arg.append(qVariantFromValue(parentsParcel));
 
     sendParcel.setArguments(arg);
-
-    if ( !QDBusConnection::sessionBus().send( sendParcel) )
-    {
-        qDebug()<<QString("D-bus %1 calling error: %2").arg(studentMetod).arg(QDBusConnection::sessionBus().lastError().message());
+    qDebug() << "send Parcel to student " << sendParcel;
+    if (!QDBusConnection::sessionBus().send(sendParcel)) {
+        qDebug() << QString("D-bus %1 calling error: %2").arg(studentMetod).arg(
+                QDBusConnection::sessionBus().lastError().message());
     }
 }
 
-Letter Parents::writeLetter(const Letter letterFromStudent) const
-{
+Letter Parents::writeLetter(const Letter letterFromStudent) const {
     QString text = "We read about you problem so send some help";
     Letter parentLetter;
     parentLetter.text = text;
-    Money summ;
-    summ.summ = letterFromStudent.text.count(",")*100;
-    summ.summ += letterFromStudent.text.count(".")*50;
-    summ.summ += letterFromStudent.text.count(" ")*5;
-    summ.type = "USD";
-    parentLetter.summ = summ;
+    parentLetter.summ = letterFromStudent.summ;
     parentLetter.letterDate = QDateTime::currentDateTime();
     return parentLetter;
 }
 
-Stuff Parents::poskrestiPoSusekam() const
-{
+Stuff Parents::poskrestiPoSusekam() const {
     Stuff food;
-    food<<"Russian donuts";
-    food<<"Meat dumplings";
+    food << "Russian donuts";
+    food << "Meat dumplings";
     return food;
+}
+
+void Parents::reciveParcel(QString parcelDescription) {
+    qDebug() << "reciveParcel from student " << parcelDescription;
 }

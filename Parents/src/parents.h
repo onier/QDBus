@@ -14,6 +14,7 @@ public:
 
 private slots:
     void reciveLetter(const Letter letterFromStudent);
+    void reciveParcel(QString parcelDescription);
 
 private:
     void connectToDBusSignal();

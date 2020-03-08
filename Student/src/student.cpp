@@ -12,6 +12,7 @@ Student::~Student() {
 }
 
 void Student::reciveParcel(Parcel parcelFromParents) {
+    qDebug()<<"reciveParcel from parent "<<parcelFromParents;
     QString letterText = parcelFromParents.letter.text;
     letterText.append(
             QString("\n Money: %1 %2").arg(parcelFromParents.letter.summ.summ).arg(parcelFromParents.letter.summ.type));
@@ -25,6 +26,7 @@ void Student::reciveParcel(Parcel parcelFromParents) {
     parcelDescription.append(letterText);
     parcelDescription.append("\n");
     parcelDescription.append(stuffText);
+    qDebug()<<"emit parcelRecived "<< parcelDescription;
     emit parcelRecived(parcelDescription);
 }
 
