@@ -11,6 +11,9 @@ cd puppy
 git clone https://github.com/onier/QDBus.git
 
 mkdir build
+
 cd build 
+
 cmake -DCMAKE_BUILD_TYPE=debug ..
+
 make 
