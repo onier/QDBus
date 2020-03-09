@@ -1,4 +1,4 @@
-本例子主要演示如何通过qt dbus发送自动的数据结构。
+本例子主要演示如何通过qt dbus发送自定义的数据结构。
 
 Student讲自己注册到dbus,通过needHelp信号发送Letter到parent,parent收到回复后
 调用student的reciveParcel发送Parcel对象，Student收到数据之后，发送parcelRecived信号通知已经收到包。
